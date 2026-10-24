@@ -1,40 +1,47 @@
+
 package com.example;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MySQLConnection {
 
+    private static final String URL =
+            "jdbc:mysql://localhost:3306/banking_db";
+    private static final String USER = "***";  // username for your MySQL database
+    private static final String PASSWORD = "***"; // user password for your MySQL database
+
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
+
     public static void main(String[] args) {
 
-        String url = "jdbc:mysql://localhost:3306/student_db";
-        String user = "******";
-        String password = "******";
+        String query = "SELECT customer_id, name, address, contact FROM customers";
 
-        // String query = "SELECT id, name, age FROM students";
-
-        try (Connection con =
-                     DriverManager.getConnection(url, user, password)) {
+        try (Connection con = getConnection()) {
 
             System.out.println("MySQL connected successfully!");
+            System.out.println("Database: " +
+                    con.getCatalog());
 
-            // Statement stmt = con.createStatement();
+            try (PreparedStatement ps = con.prepareStatement(query);
+                 ResultSet rs = ps.executeQuery()) {
 
-            // ResultSet resultSet = stmt.executeQuery(query);
+                System.out.println("\n----- CUSTOMERS -----");
 
-            // while (resultSet.next()) {
-            //     int id = resultSet.getInt("id");
-            //     String name = resultSet.getString("name");
-            //     int age = resultSet.getInt("age");
-
-            //     System.out.println(
-            //         "ID: " + id +
-            //         ", Name: " + name +
-            //         ", Age: " + age
-            //     );
-            // }
-            // resultSet.close();
-            // stmt.close();
+                while (rs.next()) {
+                    System.out.println(
+                            "ID: " + rs.getInt("customer_id") +
+                            ", Name: " + rs.getString("name") +
+                            ", Address: " + rs.getString("address") +
+                            ", Contact: " + rs.getString("contact")
+                    );
+                }
+            }
 
         } catch (SQLException e) {
             System.out.println("Database connection or query failed!");
