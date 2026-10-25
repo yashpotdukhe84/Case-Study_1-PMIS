@@ -1,21 +1,29 @@
 
 package com.example.model;
 
+import java.util.Objects;
+
 public class Beneficiary {
+
     private int beneficiaryID;
     private int customerID;
     private String name;
     private String accountNumber;
     private String bankDetails;
 
+    // Default constructor
+    public Beneficiary() {
+    }
+
+    // Parameterized constructor
     public Beneficiary(int beneficiaryID, int customerID,
                        String name, String accountNumber,
                        String bankDetails) {
-        this.beneficiaryID = beneficiaryID;
-        this.customerID = customerID;
-        this.name = name;
-        this.accountNumber = accountNumber;
-        this.bankDetails = bankDetails;
+        setBeneficiaryID(beneficiaryID);
+        setCustomerID(customerID);
+        setName(name);
+        setAccountNumber(accountNumber);
+        setBankDetails(bankDetails);
     }
 
     public int getBeneficiaryID() {
@@ -23,6 +31,10 @@ public class Beneficiary {
     }
 
     public void setBeneficiaryID(int beneficiaryID) {
+        if (beneficiaryID < 0) {
+            throw new IllegalArgumentException(
+                    "Beneficiary ID cannot be negative");
+        }
         this.beneficiaryID = beneficiaryID;
     }
 
@@ -31,6 +43,10 @@ public class Beneficiary {
     }
 
     public void setCustomerID(int customerID) {
+        if (customerID <= 0) {
+            throw new IllegalArgumentException(
+                    "Customer ID must be positive");
+        }
         this.customerID = customerID;
     }
 
@@ -39,7 +55,11 @@ public class Beneficiary {
     }
 
     public void setName(String name) {
-        this.name = name;
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Beneficiary name cannot be empty");
+        }
+        this.name = name.trim();
     }
 
     public String getAccountNumber() {
@@ -47,7 +67,11 @@ public class Beneficiary {
     }
 
     public void setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
+        if (accountNumber == null || accountNumber.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Account number cannot be empty");
+        }
+        this.accountNumber = accountNumber.trim();
     }
 
     public String getBankDetails() {
@@ -55,15 +79,32 @@ public class Beneficiary {
     }
 
     public void setBankDetails(String bankDetails) {
-        this.bankDetails = bankDetails;
+        if (bankDetails == null || bankDetails.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Bank details cannot be empty");
+        }
+        this.bankDetails = bankDetails.trim();
     }
 
     @Override
     public String toString() {
-        return "Beneficiary ID: " + beneficiaryID
-                + ", Customer ID: " + customerID
-                + ", Name: " + name
-                + ", Account Number: " + accountNumber
-                + ", Bank Details: " + bankDetails;
+        return "Beneficiary{" +
+                "beneficiaryID=" + beneficiaryID +
+                ", customerID=" + customerID +
+                ", name='" + name + '\'' +
+                ", accountNumber='" + maskAccountNumber() + '\'' +
+                ", bankDetails='" + bankDetails + '\'' +
+                '}';
+    }
+
+    private String maskAccountNumber() {
+        if (accountNumber == null || accountNumber.isEmpty()) {
+            return "Not provided";
+        }
+
+        int visibleDigits = Math.min(4, accountNumber.length());
+        return "*".repeat(accountNumber.length() - visibleDigits)
+                + accountNumber.substring(
+                        accountNumber.length() - visibleDigits);
     }
 }
